@@ -54,6 +54,7 @@ class MaterialActivity : AppCompatActivity() {
         } else if (diff > 0) {
             message = getString(R.string.smaller)
         } else {
+            // Homework: 當使用者在三次內猜對數字時(不包括三次) 回應訊息 "Excellent! The number is 6" 、"超神的! 數字就是 6"
             if (secretNumber.count < 3) {
                 message = getString(R.string.excellent_message) + secretNumber.secret
             }
