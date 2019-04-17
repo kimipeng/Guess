@@ -1,5 +1,7 @@
 package com.kimi.guess
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -36,6 +38,15 @@ class MaterialActivity : AppCompatActivity() {
 
         counter.setText(secretNumber.count.toString())
         Log.d(TAG, "Secret: ${secretNumber.secret} ")
+
+        val count = getSharedPreferences("guess", Context.MODE_PRIVATE)
+            .getInt("REC_COUNTER", -1)
+
+        val nick = getSharedPreferences("guess", Context.MODE_PRIVATE)
+            .getString("REC_NICKNAME", null)
+
+        s
+        Log.d(TAG, "REC_COUNTER: ${count} , REC_NICKNAME: ${nick}")
     }
 
     fun check(view: View) {
@@ -65,7 +76,13 @@ class MaterialActivity : AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle(getString(R.string.dialog_title))
             .setMessage(message)
-            .setPositiveButton(getString(R.string.ok), null)
+            .setPositiveButton(getString(R.string.ok), {dialog, which ->
+                if (diff == 0){
+                    val intent = Intent(this, RecordActivity::class.java)
+                    intent.putExtra("COUNTER", secretNumber.count)
+                    startActivity(intent)
+                }
+            })
             .show()
 
     }
