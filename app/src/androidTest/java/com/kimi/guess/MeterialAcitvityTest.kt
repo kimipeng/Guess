@@ -1,5 +1,6 @@
 package com.kimi.guess
 
+import android.util.Log
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions
@@ -36,6 +37,27 @@ class MeterialAcitvityTest {
                 onView(withText(resources.getString(R.string.ok))).perform(click())
             }
         }
+    }
+
+    @Test
+    fun testFloatingActionButton(){
+        val resources = activityTestRule.activity.resources
+
+        // 輸入數字
+        onView(withId(R.id.ed_number)).perform(typeText("10"))
+        onView(withId(R.id.ok_button)).perform(click())
+
+        // 按下dialog ok鍵，並關閉SoftKeyboard。SoftKeyboard不關閉會影響後面測試
+        onView(withText(resources.getString(R.string.ok))).perform(click())
+            .perform(closeSoftKeyboard())
+
+        // 測試右下方重玩的 FloatingActionButton
+        onView(withId(R.id.fab)).perform(click())
+        onView(withText(resources.getString(R.string.ok))).perform(click())
+
+        // 確認成功重設counter計數器為0
+        onView(withId(R.id.counter)).check(ViewAssertions.matches(withText("0")))
+
     }
 
 }
