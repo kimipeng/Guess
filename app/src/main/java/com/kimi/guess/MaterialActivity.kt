@@ -1,5 +1,6 @@
 package com.kimi.guess
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -17,6 +18,7 @@ class MaterialActivity : AppCompatActivity() {
     val TAG = MaterialActivity::class.java.simpleName
 
     val secretNumber = SecretNumber()
+    private val REQUEST_RECORD: Int = 100
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,16 +26,7 @@ class MaterialActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         fab.setOnClickListener { view ->
-            AlertDialog.Builder(this)
-                .setTitle("Replay game")
-                .setMessage("Are you sure?")
-                .setPositiveButton(getString(R.string.ok), { dialog, which ->
-                    secretNumber.reset()
-                    counter.setText(secretNumber.count.toString())
-                    ed_number.setText("")
-                })
-                .setNeutralButton("Cancel", null)
-                .show()
+            replay()
         }
 
         counter.setText(secretNumber.count.toString())
@@ -45,9 +38,22 @@ class MaterialActivity : AppCompatActivity() {
         val nick = getSharedPreferences("guess", Context.MODE_PRIVATE)
             .getString("REC_NICKNAME", null)
 
-        s
         Log.d(TAG, "REC_COUNTER: ${count} , REC_NICKNAME: ${nick}")
     }
+
+    private fun replay() {
+        AlertDialog.Builder(this)
+            .setTitle("Replay game")
+            .setMessage("Are you sure?")
+            .setPositiveButton(getString(R.string.ok)) { dialog, which ->
+                secretNumber.reset()
+                counter.setText(secretNumber.count.toString())
+                ed_number.setText("")
+            }
+            .setNeutralButton("Cancel", null)
+            .show()
+    }
+
 
     fun check(view: View) {
 
@@ -76,16 +82,27 @@ class MaterialActivity : AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle(getString(R.string.dialog_title))
             .setMessage(message)
-            .setPositiveButton(getString(R.string.ok), {dialog, which ->
-                if (diff == 0){
+            .setPositiveButton(getString(R.string.ok)) { dialog, which ->
+                if (diff == 0) {
                     val intent = Intent(this, RecordActivity::class.java)
                     intent.putExtra("COUNTER", secretNumber.count)
-                    startActivity(intent)
+//                    startActivity(intent)
+                    startActivityForResult(intent, REQUEST_RECORD)
                 }
-            })
+            }
             .show()
 
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_RECORD) {
+            if (resultCode == Activity.RESULT_OK) {
+                val nickname = data?.getStringExtra("NICK")
+                Log.d(TAG, "onActivityResult: "+ nickname)
+                replay()
+            }
+        }
 
+    }
 }
